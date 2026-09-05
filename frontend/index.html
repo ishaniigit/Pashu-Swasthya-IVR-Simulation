@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Pashu Swasthya - IVR Simulator</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="phone">
+
+        <!-- Phone top -->
+        <div class="phone-top">
+            <div class="speaker"></div>
+            <div class="camera"></div>
+        </div>
+
+        <!-- Screen -->
+        <div class="screen">
+
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>● ● ● 🔋</span>
+            </div>
+
+            <div class="app-name">
+                <span>🐄</span>
+                Pashu Swasthya
+            </div>
+
+            <div id="state" class="state">
+                Ready
+            </div>
+
+            <div id="message" class="message">
+                Press the call button to begin.
+            </div>
+
+            <div id="result" class="result hidden"></div>
+
+        </div>
+
+        <!-- Keypad -->
+        <div class="keypad">
+
+            <button onclick="pressKey('1')">
+                <strong>1</strong>
+                <small></small>
+            </button>
+
+            <button onclick="pressKey('2')">
+                <strong>2</strong>
+                <small>ABC</small>
+            </button>
+
+            <button onclick="pressKey('3')">
+                <strong>3</strong>
+                <small>DEF</small>
+            </button>
+
+            <button onclick="pressKey('4')">
+                <strong>4</strong>
+                <small>GHI</small>
+            </button>
+
+            <button onclick="pressKey('5')">
+                <strong>5</strong>
+                <small>JKL</small>
+            </button>
+
+            <button onclick="pressKey('6')">
+                <strong>6</strong>
+                <small>MNO</small>
+            </button>
+
+            <button onclick="pressKey('7')">
+                <strong>7</strong>
+                <small>PQRS</small>
+            </button>
+
+            <button onclick="pressKey('8')">
+                <strong>8</strong>
+                <small>TUV</small>
+            </button>
+
+            <button onclick="pressKey('9')">
+                <strong>9</strong>
+                <small>WXYZ</small>
+            </button>
+
+            <button onclick="pressKey('*')">
+                <strong>*</strong>
+                <small></small>
+            </button>
+
+            <button onclick="pressKey('0')">
+                <strong>0</strong>
+                <small>+</small>
+            </button>
+
+            <button onclick="pressKey('#')">
+                <strong>#</strong>
+                <small></small>
+            </button>
+
+        </div>
+
+        <!-- Call controls -->
+        <div class="controls">
+
+            <button id="callButton" class="call" onclick="startIVR()">
+                ☎
+            </button>
+
+            <button class="end" onclick="endCall()">
+                ✕
+            </button>
+
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
