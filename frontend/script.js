@@ -3,6 +3,7 @@ const BACKEND_URL = "https://pashu-swasthya-ivr-simulation.onrender.com";
 let sessionId = null;
 let currentState = "READY";
 let selectedLanguage = "en";
+let currentAudio = null;
 
 
 // ==================================================
@@ -255,6 +256,19 @@ async function startIVR() {
 // ==================================================
 
 async function pressKey(key) {
+
+    // ==================================================
+    // STOP CURRENT VOICE WHEN ANY KEY IS PRESSED
+    // ==================================================
+
+    if (currentAudio) {
+
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+
+        currentAudio = null;
+    }
+
 
     if (!sessionId) {
 
@@ -1032,6 +1046,9 @@ async function speak(
         const audio =
             new Audio(audioURL);
 
+        // Track the currently playing voice.
+        currentAudio = audio;
+
 
         // ------------------------------------------
         // PLAY AND WAIT
@@ -1043,11 +1060,31 @@ async function speak(
                 audio.onended =
                     () => {
 
+                        if (currentAudio === audio) {
+                            currentAudio = null;
+                        }
+
                         URL.revokeObjectURL(
                             audioURL
                         );
 
                         resolve();
+                    };
+
+
+                audio.onpause =
+                    () => {
+
+                        // A keypad press sets currentAudio to null,
+                        // so the interrupted voice finishes immediately.
+                        if (currentAudio === null) {
+
+                            URL.revokeObjectURL(
+                                audioURL
+                            );
+
+                            resolve();
+                        }
                     };
 
 
@@ -1058,6 +1095,10 @@ async function speak(
                             "Audio playback error:",
                             error
                         );
+
+                        if (currentAudio === audio) {
+                            currentAudio = null;
+                        }
 
                         URL.revokeObjectURL(
                             audioURL
@@ -1075,6 +1116,10 @@ async function speak(
                                 "Audio play failed:",
                                 error
                             );
+
+                            if (currentAudio === audio) {
+                                currentAudio = null;
+                            }
 
                             URL.revokeObjectURL(
                                 audioURL
@@ -1102,6 +1147,16 @@ async function speak(
 // ==================================================
 
 async function endCall() {
+
+    // Stop any currently playing voice.
+    if (currentAudio) {
+
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+
+        currentAudio = null;
+    }
+
 
     if (sessionId) {
 
