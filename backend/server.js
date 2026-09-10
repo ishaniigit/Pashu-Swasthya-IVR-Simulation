@@ -3,6 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const axios = require("axios");
 const crypto = require("crypto");
+const { Pool } = require("pg");
 
 const {
     createInitialSession,
@@ -10,8 +11,17 @@ const {
 } = require("./ivrFlow");
 
 dotenv.config();
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false
+    }
+});
 
 const app = express();
+pool.query("SELECT NOW()")
+    .then(() => console.log("PostgreSQL connected successfully"))
+    .catch((err) => console.error("PostgreSQL connection failed:", err.message));
 
 const PORT = process.env.PORT || 5000;
 

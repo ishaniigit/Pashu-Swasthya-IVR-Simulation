@@ -1,5 +1,9 @@
 const axios = require("axios");
 
+const TEAM_BACKEND_URL =
+    process.env.TEAM_BACKEND_URL ||
+    "https://pashuraksha-pearl.vercel.app";
+
 
 // ==================================================
 // LANGUAGES
@@ -525,6 +529,153 @@ async function analyzeWithML(session) {
 
 
 // ==================================================
+// SUBMIT REPORT TO TEAM BACKEND
+// ==================================================
+
+async function submitReportToBackend(session) {
+
+    // ------------------------------------------
+    // GET DEMO FARMER TOKEN
+    // ------------------------------------------
+
+    const authResponse = await axios.post(
+        `${TEAM_BACKEND_URL}/api/auth/dev-token`,
+        {
+            role: "farmer"
+        },
+        {
+            timeout: 15000
+        }
+    );
+
+    const token = authResponse.data?.token;
+
+    if (!token) {
+        throw new Error("Team backend did not return an authentication token");
+    }
+
+
+    // ------------------------------------------
+    // CONVERT SELECTED SYMPTOMS TO ARRAY
+    // ------------------------------------------
+
+    const selectedSymptoms =
+        Object.keys(session.symptoms).filter(
+            symptom => session.symptoms[symptom]
+        );
+
+
+    // ------------------------------------------
+    // CREATE REPORT PAYLOAD
+    // ------------------------------------------
+
+    const reportPayload = {
+
+        animal_type:
+            session.animal,
+
+        symptoms:
+            selectedSymptoms,
+
+        age_years:
+            session.age_years,
+
+        days_since_onset:
+            session.days_since_onset,
+
+        vaccination_status:
+            session.vaccination_status?.toLowerCase() === "yes"
+                ? "yes"
+                : "unsure",
+
+        // Demo location.
+        // The dev-token farmer currently belongs to Pune.
+        district:
+            process.env.IVR_REPORT_DISTRICT || "Pune"
+    };
+
+
+    console.log(
+        "\n======================================"
+    );
+
+    console.log(
+        "SUBMITTING IVR REPORT"
+    );
+
+    console.log(
+        "Team Backend:",
+        TEAM_BACKEND_URL
+    );
+
+    console.log(
+        "Report Payload:",
+        reportPayload
+    );
+
+    console.log(
+        "======================================"
+    );
+
+
+    // ------------------------------------------
+    // SUBMIT REPORT
+    // ------------------------------------------
+
+    const response = await axios.post(
+        `${TEAM_BACKEND_URL}/api/reports`,
+        reportPayload,
+        {
+            headers: {
+                Authorization:
+                    `Bearer ${token}`,
+
+                "Content-Type":
+                    "application/json"
+            },
+
+            timeout: 20000
+        }
+    );
+
+
+    console.log(
+        "\n======================================"
+    );
+
+    console.log(
+        "IVR REPORT STORED SUCCESSFULLY"
+    );
+
+    console.log(
+        "Report ID:",
+        response.data?.data?.id
+    );
+
+    console.log(
+        "Stored Disease:",
+        response.data?.data?.predicted_disease
+    );
+
+    console.log(
+        "Stored Confidence:",
+        response.data?.data?.disease_confidence
+    );
+
+    console.log(
+        "Stored Urgency:",
+        response.data?.data?.predicted_urgency
+    );
+
+    console.log(
+        "======================================\n"
+    );
+
+
+    return response.data;
+}
+
+// ==================================================
 // HANDLE KEYPAD
 // ==================================================
 
@@ -947,32 +1098,94 @@ async function handleKey(
         try {
 
             const prediction =
-                await analyzeWithML(
-                    session
-                );
+    await analyzeWithML(
+        session
+    );
 
 
-            session.prediction =
-                prediction;
+// ------------------------------------------
+// STORE ML RESULT IN SESSION
+// ------------------------------------------
+
+session.prediction =
+    prediction;
 
 
-            session.state =
-                "RESULT";
+// ------------------------------------------
+// SUBMIT REPORT AFTER ML ANALYSIS
+// ------------------------------------------
+//
+// IMPORTANT:
+// The farmer's analysis is already complete.
+// Now we store the report in the team backend.
+//
+
+try {
+
+    const report =
+        await submitReportToBackend(
+            session
+        );
+
+    // Store report information in the session
+    // so it can be inspected/debugged later.
+
+    session.report_id =
+        report?.data?.id || null;
+
+    session.report_status =
+        "stored";
+
+} catch (reportError) {
+
+    console.error(
+        "\n======================================"
+    );
+
+    console.error(
+        "REPORT STORAGE ERROR"
+    );
+
+    console.error(
+        reportError.response?.data ||
+        reportError.message
+    );
+
+    console.error(
+        "======================================\n"
+    );
+
+    // IMPORTANT:
+    // Do NOT prevent the farmer from receiving
+    // the ML result just because report storage
+    // failed.
+
+    session.report_status =
+        "failed";
+}
 
 
-            return {
+// ------------------------------------------
+// MOVE TO RESULT
+// ------------------------------------------
 
-                session,
+session.state =
+    "RESULT";
 
-                state: "RESULT",
 
-                message:
-                    PROMPTS[
-                        language
-                    ].result,
+return {
 
-                prediction
-            };
+    session,
+
+    state: "RESULT",
+
+    message:
+        PROMPTS[
+            language
+        ].result,
+
+    prediction
+};
 
 
         } catch (error) {

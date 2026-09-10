@@ -1,4 +1,4 @@
-const BACKEND_URL = "https://pashu-swasthya-ivr-simulation.onrender.com";
+const BACKEND_URL = "http://localhost:5000";
 
 let sessionId = null;
 let currentState = "READY";
