@@ -59,7 +59,7 @@ const ANIMALS = {
 
 
 // ==================================================
-// SYMPTOMS
+// MAIN SYMPTOMS
 // ==================================================
 
 const SYMPTOMS = {
@@ -136,12 +136,64 @@ const SYMPTOMS = {
 
 
 // ==================================================
-// SYMPTOM MENU
+// MORE SYMPTOMS
+// ==================================================
+
+const MORE_SYMPTOMS = {
+    "1": {
+        field: "nasal_discharge",
+        en: "Nasal discharge",
+        hi: "नाक से स्राव",
+        mr: "नाकातून स्राव"
+    },
+
+    "2": {
+        field: "eye_discharge",
+        en: "Eye discharge",
+        hi: "आंखों से स्राव",
+        mr: "डोळ्यांतून स्राव"
+    },
+
+    "3": {
+        field: "diarrhea",
+        en: "Diarrhea",
+        hi: "दस्त",
+        mr: "जुलाब"
+    },
+
+    "4": {
+        field: "coughing",
+        en: "Coughing",
+        hi: "खांसी",
+        mr: "खोकला"
+    },
+
+    "5": {
+        field: "milk_drop",
+        en: "Reduced milk production",
+        hi: "दूध उत्पादन में कमी",
+        mr: "दूध उत्पादनात घट"
+    }
+};
+
+
+// ==================================================
+// SYMPTOM MENUS
 // ==================================================
 
 function getSymptomMenu(language) {
 
     return Object.entries(SYMPTOMS).map(
+        ([key, symptom]) => {
+            return `${key}. ${symptom[language]}`;
+        }
+    );
+}
+
+
+function getMoreSymptomMenu(language) {
+
+    return Object.entries(MORE_SYMPTOMS).map(
         ([key, symptom]) => {
             return `${key}. ${symptom[language]}`;
         }
@@ -167,10 +219,13 @@ const PROMPTS = {
             "Select the age of the animal. Press 1 for 1 year, 2 for 2 years, or 3 for 3 years or older.",
 
         vaccination:
-            "Is the animal vaccinated? Press 1 for Yes or 0 for No.",
+            "What is the vaccination status? Press 1 for vaccinated, 2 for unvaccinated, or 3 if unsure.",
 
         symptoms:
-            "Please select all symptoms. Press the corresponding number for each symptom. Press the number again to remove a symptom. Press hash when you are finished.",
+            "Please select all symptoms. Press the corresponding number for each symptom. Press the number again to remove a symptom. Press star for more symptoms. Press hash when you are finished.",
+
+        moreSymptoms:
+            "More symptoms. Press 1 for nasal discharge, 2 for eye discharge, 3 for diarrhea, 4 for coughing, or 5 for reduced milk production. Press hash when you are finished.",
 
         duration:
             "How many days have the symptoms been present? Press 1 for 1 day, 2 for 2 days, 3 for 3 days, or 4 for 4 or more days.",
@@ -207,10 +262,13 @@ const PROMPTS = {
             "पशु की उम्र चुनें। 1 साल के लिए 1, 2 साल के लिए 2, या 3 साल या उससे अधिक के लिए 3 दबाएं।",
 
         vaccination:
-            "क्या पशु का टीकाकरण हुआ है? हाँ के लिए 1 और नहीं के लिए 0 दबाएं।",
+            "पशु के टीकाकरण की स्थिति बताएं। टीकाकरण हुआ है तो 1, नहीं हुआ है तो 2, और जानकारी न होने पर 3 दबाएं।",
 
         symptoms:
-            "सभी लक्षण चुनें। संबंधित नंबर दबाएं। किसी लक्षण को हटाने के लिए उसका नंबर दोबारा दबाएं। लक्षण चुनने के बाद हैश दबाएं।",
+            "सभी लक्षण चुनें। संबंधित नंबर दबाएं। किसी लक्षण को हटाने के लिए उसका नंबर दोबारा दबाएं। अधिक लक्षणों के लिए स्टार दबाएं। चयन पूरा होने पर हैश दबाएं।",
+
+        moreSymptoms:
+            "अधिक लक्षण। नाक से स्राव के लिए 1, आंखों से स्राव के लिए 2, दस्त के लिए 3, खांसी के लिए 4, या दूध उत्पादन में कमी के लिए 5 दबाएं। चयन पूरा होने पर हैश दबाएं।",
 
         duration:
             "पशु को ये लक्षण कितने दिनों से हैं? 1 दिन के लिए 1, 2 दिन के लिए 2, 3 दिन के लिए 3, या 4 या उससे अधिक दिनों के लिए 4 दबाएं।",
@@ -247,10 +305,13 @@ const PROMPTS = {
             "प्राण्याचे वय निवडा. 1 वर्षासाठी 1, 2 वर्षांसाठी 2, किंवा 3 वर्षे किंवा त्यापेक्षा जास्त वयासाठी 3 दाबा.",
 
         vaccination:
-            "प्राण्याचे लसीकरण झाले आहे का? होय साठी 1 आणि नाही साठी 0 दाबा.",
+            "प्राण्याच्या लसीकरणाची स्थिती सांगा. लसीकरण झाले असल्यास 1, झाले नसल्यास 2, आणि माहिती नसल्यास 3 दाबा।",
 
         symptoms:
-            "सर्व लक्षणे निवडा. संबंधित क्रमांक दाबा. एखादे लक्षण काढण्यासाठी तो क्रमांक पुन्हा दाबा. लक्षणे निवडल्यानंतर हॅश दाबा.",
+            "सर्व लक्षणे निवडा. संबंधित क्रमांक दाबा. एखादे लक्षण काढण्यासाठी तो क्रमांक पुन्हा दाबा. अधिक लक्षणांसाठी स्टार दाबा. निवड पूर्ण झाल्यावर हॅश दाबा।",
+
+        moreSymptoms:
+            "अधिक लक्षणे. नाकातून स्रावासाठी 1, डोळ्यांतून स्रावासाठी 2, जुलाबासाठी 3, खोकल्यासाठी 4, किंवा दूध उत्पादनात घट असल्यास 5 दाबा. निवड पूर्ण झाल्यावर हॅश दाबा।",
 
         duration:
             "प्राण्याला ही लक्षणे किती दिवसांपासून आहेत? 1 दिवसासाठी 1, 2 दिवसांसाठी 2, 3 दिवसांसाठी 3, किंवा 4 किंवा अधिक दिवसांसाठी 4 दाबा.",
@@ -345,11 +406,15 @@ function getAge(key) {
 function getVaccinationStatus(key) {
 
     if (key === "1") {
-        return "Yes";
+        return "vaccinated";
     }
 
-    if (key === "0") {
-        return "No";
+    if (key === "2") {
+        return "unvaccinated";
+    }
+
+    if (key === "3") {
+        return "unsure";
     }
 
     return null;
@@ -359,6 +424,7 @@ function getVaccinationStatus(key) {
 // ==================================================
 // ML CALL
 // ==================================================
+
 async function analyzeWithML(session) {
 
     const payload = {
@@ -369,9 +435,6 @@ async function analyzeWithML(session) {
 
         species:
             session.animal,
-
-        temperature:
-            102.0,
 
 
         // ------------------------------------------
@@ -408,20 +471,25 @@ async function analyzeWithML(session) {
         salivation:
             !!session.symptoms.salivation,
 
+
+        // ------------------------------------------
+        // NEW SYMPTOMS
+        // ------------------------------------------
+
         nasal_discharge:
-            false,
+            !!session.symptoms.nasal_discharge,
 
         eye_discharge:
-            false,
+            !!session.symptoms.eye_discharge,
 
         diarrhea:
-            false,
+            !!session.symptoms.diarrhea,
 
         coughing:
-            false,
+            !!session.symptoms.coughing,
 
         milk_drop:
-            false,
+            !!session.symptoms.milk_drop,
 
 
         // ------------------------------------------
@@ -430,6 +498,7 @@ async function analyzeWithML(session) {
 
         // Vision is not being used in the IVR yet.
         // ML service expects a string or null.
+
         vision_prediction:
             null,
 
@@ -457,8 +526,8 @@ async function analyzeWithML(session) {
         // LOCATION
         // ------------------------------------------
 
-        // ML service expects floats, so use 0.0
-        // when GPS/location is not collected.
+        // Location is not collected by the IVR yet.
+
         lat:
             0.0,
 
@@ -551,7 +620,9 @@ async function submitReportToBackend(session) {
     const token = authResponse.data?.token;
 
     if (!token) {
-        throw new Error("Team backend did not return an authentication token");
+        throw new Error(
+            "Team backend did not return an authentication token"
+        );
     }
 
 
@@ -584,12 +655,15 @@ async function submitReportToBackend(session) {
             session.days_since_onset,
 
         vaccination_status:
-            session.vaccination_status?.toLowerCase() === "yes"
+            session.vaccination_status === "vaccinated"
                 ? "yes"
-                : "unsure",
+                : session.vaccination_status === "unvaccinated"
+                    ? "no"
+                    : "unsure",
 
         // Demo location.
         // The dev-token farmer currently belongs to Pune.
+
         district:
             process.env.IVR_REPORT_DISTRICT || "Pune"
     };
@@ -674,6 +748,7 @@ async function submitReportToBackend(session) {
 
     return response.data;
 }
+
 
 // ==================================================
 // HANDLE KEYPAD
@@ -865,26 +940,13 @@ async function handleKey(
 
 
         // ------------------------------------------
-        // IMPORTANT:
-        // SEND COMPLETE SYMPTOM MENU
+        // SEND MAIN SYMPTOM MENU
         // ------------------------------------------
 
         const menu =
             getSymptomMenu(
                 language
             );
-
-
-        const finishMessage =
-            language === "hi"
-
-                ? "लक्षण चुनने के बाद हैश दबाएं।"
-
-                : language === "mr"
-
-                    ? "लक्षणे निवडल्यानंतर हॅश दाबा."
-
-                    : "Press hash when you are finished.";
 
 
         return {
@@ -904,18 +966,78 @@ async function handleKey(
 
                 "\n\n" +
 
-                finishMessage
+                (
+                    language === "hi"
+                        ? "*. अधिक लक्षण"
+                        : language === "mr"
+                            ? "*. अधिक लक्षणे"
+                            : "*. More symptoms"
+                ) +
+
+                "\n" +
+
+                (
+                    language === "hi"
+                        ? "#. समाप्त करें"
+                        : language === "mr"
+                            ? "#. पूर्ण करा"
+                            : "#. Finish"
+                )
         };
     }
 
 
     // ==============================================
-    // SYMPTOMS
+    // MAIN SYMPTOMS
     // ==============================================
 
     if (
         session.state === "SYMPTOMS"
     ) {
+
+        // ------------------------------------------
+        // STAR = MORE SYMPTOMS
+        // ------------------------------------------
+
+        if (key === "*") {
+
+            session.state =
+                "MORE_SYMPTOMS";
+
+
+            const menu =
+                getMoreSymptomMenu(
+                    language
+                );
+
+
+            return {
+
+                session,
+
+                state: "MORE_SYMPTOMS",
+
+                message:
+                    PROMPTS[
+                        language
+                    ].moreSymptoms +
+
+                    "\n\n" +
+
+                    menu.join("\n") +
+
+                    "\n\n" +
+
+                    (
+                        language === "hi"
+                            ? "#. समाप्त करें"
+                            : language === "mr"
+                                ? "#. पूर्ण करा"
+                                : "#. Finish"
+                    )
+            };
+        }
+
 
         // ------------------------------------------
         // HASH = FINISH
@@ -973,7 +1095,7 @@ async function handleKey(
 
 
         // ------------------------------------------
-        // FIND SYMPTOM
+        // FIND MAIN SYMPTOM
         // ------------------------------------------
 
         const symptom =
@@ -1060,6 +1182,156 @@ async function handleKey(
 
 
     // ==============================================
+    // MORE SYMPTOMS
+    // ==============================================
+
+    if (
+        session.state === "MORE_SYMPTOMS"
+    ) {
+
+        // ------------------------------------------
+        // HASH = FINISH
+        // ------------------------------------------
+
+        if (key === "#") {
+
+            const selectedSymptoms =
+                Object.keys(
+                    session.symptoms
+                ).filter(
+                    symptom =>
+                        session.symptoms[
+                            symptom
+                        ]
+                );
+
+
+            if (
+                selectedSymptoms.length === 0
+            ) {
+
+                return {
+
+                    session,
+
+                    state: "MORE_SYMPTOMS",
+
+                    message:
+                        PROMPTS[
+                            language
+                        ].noSymptoms
+                };
+            }
+
+
+            session.state =
+                "DURATION";
+
+
+            return {
+
+                session,
+
+                state: "DURATION",
+
+                message:
+                    PROMPTS[
+                        language
+                    ].duration,
+
+                selectedSymptoms
+            };
+        }
+
+
+        // ------------------------------------------
+        // FIND ADDITIONAL SYMPTOM
+        // ------------------------------------------
+
+        const symptom =
+            MORE_SYMPTOMS[key];
+
+
+        if (!symptom) {
+
+            return {
+
+                session,
+
+                state: "MORE_SYMPTOMS",
+
+                message:
+                    PROMPTS[
+                        language
+                    ].invalid
+            };
+        }
+
+
+        // ------------------------------------------
+        // TOGGLE
+        // ------------------------------------------
+
+        const field =
+            symptom.field;
+
+
+        const wasSelected =
+            !!session.symptoms[field];
+
+
+        session.symptoms[field] =
+            !wasSelected;
+
+
+        // ------------------------------------------
+        // CONFIRMATION MESSAGE
+        // ------------------------------------------
+
+        let message;
+
+
+        if (
+            !wasSelected
+        ) {
+
+            message =
+                `${symptom[language]} ` +
+                `${PROMPTS[language].symptomSelected}`;
+
+        } else {
+
+            message =
+                `${symptom[language]} ` +
+                `${PROMPTS[language].symptomRemoved}`;
+        }
+
+
+        const selectedSymptoms =
+            Object.keys(
+                session.symptoms
+            ).filter(
+                symptomName =>
+                    session.symptoms[
+                        symptomName
+                    ]
+            );
+
+
+        return {
+
+            session,
+
+            state: "MORE_SYMPTOMS",
+
+            message,
+
+            selectedSymptoms
+        };
+    }
+
+
+    // ==============================================
     // DURATION
     // ==============================================
 
@@ -1098,94 +1370,86 @@ async function handleKey(
         try {
 
             const prediction =
-    await analyzeWithML(
-        session
-    );
+                await analyzeWithML(
+                    session
+                );
 
 
-// ------------------------------------------
-// STORE ML RESULT IN SESSION
-// ------------------------------------------
+            // ------------------------------------------
+            // STORE ML RESULT IN SESSION
+            // ------------------------------------------
 
-session.prediction =
-    prediction;
-
-
-// ------------------------------------------
-// SUBMIT REPORT AFTER ML ANALYSIS
-// ------------------------------------------
-//
-// IMPORTANT:
-// The farmer's analysis is already complete.
-// Now we store the report in the team backend.
-//
-
-try {
-
-    const report =
-        await submitReportToBackend(
-            session
-        );
-
-    // Store report information in the session
-    // so it can be inspected/debugged later.
-
-    session.report_id =
-        report?.data?.id || null;
-
-    session.report_status =
-        "stored";
-
-} catch (reportError) {
-
-    console.error(
-        "\n======================================"
-    );
-
-    console.error(
-        "REPORT STORAGE ERROR"
-    );
-
-    console.error(
-        reportError.response?.data ||
-        reportError.message
-    );
-
-    console.error(
-        "======================================\n"
-    );
-
-    // IMPORTANT:
-    // Do NOT prevent the farmer from receiving
-    // the ML result just because report storage
-    // failed.
-
-    session.report_status =
-        "failed";
-}
+            session.prediction =
+                prediction;
 
 
-// ------------------------------------------
-// MOVE TO RESULT
-// ------------------------------------------
+            // ------------------------------------------
+            // SUBMIT REPORT AFTER ML ANALYSIS
+            // ------------------------------------------
 
-session.state =
-    "RESULT";
+            try {
+
+                const report =
+                    await submitReportToBackend(
+                        session
+                    );
 
 
-return {
+                session.report_id =
+                    report?.data?.id || null;
 
-    session,
+                session.report_status =
+                    "stored";
 
-    state: "RESULT",
+            } catch (reportError) {
 
-    message:
-        PROMPTS[
-            language
-        ].result,
+                console.error(
+                    "\n======================================"
+                );
 
-    prediction
-};
+                console.error(
+                    "REPORT STORAGE ERROR"
+                );
+
+                console.error(
+                    reportError.response?.data ||
+                    reportError.message
+                );
+
+                console.error(
+                    "======================================\n"
+                );
+
+
+                // Do not prevent the farmer from
+                // receiving the ML result.
+
+                session.report_status =
+                    "failed";
+            }
+
+
+            // ------------------------------------------
+            // MOVE TO RESULT
+            // ------------------------------------------
+
+            session.state =
+                "RESULT";
+
+
+            return {
+
+                session,
+
+                state: "RESULT",
+
+                message:
+                    PROMPTS[
+                        language
+                    ].result,
+
+                prediction
+            };
 
 
         } catch (error) {
@@ -1215,7 +1479,7 @@ return {
 
                         : language === "mr"
 
-                            ? "विश्लेषण करताना समस्या आली. कृपया नंतर पुन्हा प्रयत्न करा."
+                            ? "विश्लेषण करताना समस्या आली. कृपया नंतर पुन्हा प्रयास करा."
 
                             : "There was an error while analysing the symptoms. Please try again later.",
 

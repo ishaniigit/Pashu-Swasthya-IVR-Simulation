@@ -68,26 +68,39 @@ const translations = {
     VACCINATION: {
 
         en:
-            "Is the animal vaccinated? Press 1 for yes or 0 for no.",
+            "Is the animal vaccinated? Press 1 if vaccinated, 2 if unvaccinated, or 3 if you are unsure.",
 
         hi:
-            "क्या पशु का टीकाकरण हुआ है? हाँ के लिए 1 और नहीं के लिए 0 दबाएँ।",
+            "क्या पशु का टीकाकरण हुआ है? टीकाकरण हुआ है तो 1, नहीं हुआ है तो 2, और जानकारी न होने पर 3 दबाएँ।",
 
         mr:
-            "प्राण्याचे लसीकरण झाले आहे का? होय साठी 1 आणि नाही साठी 0 दाबा।"
+            "प्राण्याचे लसीकरण झाले असल्यास 1, झाले नसल्यास 2, आणि माहिती नसल्यास 3 दाबा."
     },
 
 
     SYMPTOMS: {
 
         en:
-            "Please select all symptoms. Press the corresponding number for each symptom. Press the number again to remove a symptom. Press hash when you are finished.",
+            "Please select all symptoms. Press the corresponding number for each symptom. Press the number again to remove a symptom. Press star for more symptoms, or press hash when you are finished.",
 
         hi:
-            "कृपया सभी लक्षण चुनें। प्रत्येक लक्षण के लिए संबंधित नंबर दबाएँ। किसी लक्षण को हटाने के लिए उसका नंबर दोबारा दबाएँ। चयन पूरा होने पर हैश दबाएँ।",
+            "कृपया सभी लक्षण चुनें। प्रत्येक लक्षण के लिए संबंधित नंबर दबाएँ। किसी लक्षण को हटाने के लिए उसका नंबर दोबारा दबाएँ। अतिरिक्त लक्षणों के लिए स्टार दबाएँ, और चयन पूरा होने पर हैश दबाएँ।",
 
         mr:
-            "कृपया सर्व लक्षणे निवडा. प्रत्येक लक्षणासाठी संबंधित क्रमांक दाबा. एखादे लक्षण काढण्यासाठी तो क्रमांक पुन्हा दाबा. निवड पूर्ण झाल्यावर हॅश दाबा."
+            "कृपया सर्व लक्षणे निवडा. प्रत्येक लक्षणासाठी संबंधित क्रमांक दाबा. एखादे लक्षण काढण्यासाठी तो क्रमांक पुन्हा दाबा. अतिरिक्त लक्षणांसाठी स्टार दाबा आणि निवड पूर्ण झाल्यावर हॅश दाबा."
+    },
+
+
+    MORE_SYMPTOMS: {
+
+        en:
+            "More symptoms. Press 1 for nasal discharge, 2 for eye discharge, 3 for diarrhea, 4 for coughing, or 5 for milk drop. Press hash when you are finished.",
+
+        hi:
+            "अतिरिक्त लक्षणों के लिए 1 नाक से पानी आना, 2 आँखों से पानी आना, 3 दस्त, 4 खाँसी, या 5 दूध कम होना चुनें। चयन पूरा होने पर हैश दबाएँ।",
+
+        mr:
+            "अतिरिक्त लक्षणांसाठी 1 नाकातून स्त्राव, 2 डोळ्यांतून स्त्राव, 3 जुलाब, 4 खोकला, किंवा 5 दूध कमी होणे निवडा. निवड पूर्ण झाल्यावर हॅश दाबा."
     },
 
 
@@ -457,24 +470,54 @@ async function pressKey(key) {
         ) {
 
             /*
-             IMPORTANT:
-
-             We speak data.message directly.
-
-             The backend will send the complete
-             symptom menu including:
-
-             1. Fever
-             2. Mouth blisters
-             3. Hoof blisters
-             ...
-
-             in the selected language.
-            */
+             * IMPORTANT:
+             *
+             * We speak data.message directly.
+             *
+             * The backend sends the complete
+             * symptom menu in the selected language.
+             */
 
             const message =
                 data.message ||
                 translations.SYMPTOMS[
+                    selectedLanguage
+                ];
+
+
+            await speak(
+                message,
+                selectedLanguage
+            );
+
+
+            return;
+        }
+
+
+        // ==========================================
+        // MORE SYMPTOMS
+        // ==========================================
+
+        if (
+            data.state === "MORE_SYMPTOMS"
+        ) {
+
+            /*
+             * The backend controls the More Symptoms menu.
+             *
+             * The user can:
+             *
+             * 1. Select additional symptoms using 1–5.
+             * 2. Press # immediately if there are
+             *    no additional symptoms.
+             *
+             * The backend will then move to DURATION.
+             */
+
+            const message =
+                data.message ||
+                translations.MORE_SYMPTOMS[
                     selectedLanguage
                 ];
 
@@ -636,24 +679,24 @@ function updateScreen(data) {
 
 
         /*
-         ML RESPONSE STRUCTURE:
-
-         {
-             prediction: {
-                 prediction: {
-                     disease: "...",
-                     confidence_score: ...
-                 },
-
-                 urgency_assessment: {...},
-
-                 advisory: {...}
-             }
-         }
-
-         Therefore we unwrap the outer
-         prediction object first.
-        */
+         * ML RESPONSE STRUCTURE:
+         *
+         * {
+         *     prediction: {
+         *         prediction: {
+         *             disease: "...",
+         *             confidence_score: ...
+         *         },
+         *
+         *         urgency_assessment: {...},
+         *
+         *         advisory: {...}
+         *     }
+         * }
+         *
+         * Therefore we unwrap the outer
+         * prediction object first.
+         */
 
         if (
             predictionData.prediction &&
@@ -734,26 +777,25 @@ async function speakMLResult(
 
 
     /*
-     IMPORTANT:
-
-     Actual ML response:
-
-     predictionData
-        ↓
-     {
-       prediction: {
-         prediction: {
-           disease,
-           confidence_score
-         },
-
-         urgency_assessment,
-         advisory
-       }
-     }
-
-     So unwrap the outer prediction.
-    */
+     * IMPORTANT:
+     *
+     * Actual ML response:
+     *
+     * predictionData
+     *      ↓
+     * {
+     *    prediction: {
+     *      prediction: {
+     *        disease,
+     *        confidence_score
+     *      },
+     *      urgency_assessment,
+     *      advisory
+     *    }
+     * }
+     *
+     * So unwrap the outer prediction.
+     */
 
 
     if (
@@ -922,19 +964,23 @@ async function speak(
             "\n================================"
         );
 
+
         console.log(
             "SARVAM TTS REQUEST"
         );
+
 
         console.log(
             "Language:",
             language
         );
 
+
         console.log(
             "Text:",
             text
         );
+
 
         console.log(
             "================================"
@@ -1046,6 +1092,7 @@ async function speak(
         const audio =
             new Audio(audioURL);
 
+
         // Track the currently playing voice.
         currentAudio = audio;
 
@@ -1064,9 +1111,11 @@ async function speak(
                             currentAudio = null;
                         }
 
+
                         URL.revokeObjectURL(
                             audioURL
                         );
+
 
                         resolve();
                     };
@@ -1083,6 +1132,7 @@ async function speak(
                                 audioURL
                             );
 
+
                             resolve();
                         }
                     };
@@ -1096,13 +1146,16 @@ async function speak(
                             error
                         );
 
+
                         if (currentAudio === audio) {
                             currentAudio = null;
                         }
 
+
                         URL.revokeObjectURL(
                             audioURL
                         );
+
 
                         resolve();
                     };
@@ -1117,13 +1170,16 @@ async function speak(
                                 error
                             );
 
+
                             if (currentAudio === audio) {
                                 currentAudio = null;
                             }
 
+
                             URL.revokeObjectURL(
                                 audioURL
                             );
+
 
                             resolve();
                         }
@@ -1168,6 +1224,7 @@ async function endCall() {
                     method: "DELETE"
                 }
             );
+
 
         } catch (error) {
 
